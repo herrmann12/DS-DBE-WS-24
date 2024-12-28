@@ -1,5 +1,5 @@
 import argparse
-from utils import send_msg
+from utils import send_leader_msg
 from constants import *
 
 def parse_arguments():
@@ -10,7 +10,7 @@ def parse_arguments():
     parser.add_argument('--election_id', type=str, required=True, help='ID of election to vote in')
     return parser.parse_args()
 
-def vote(host, port, unique_id, candidate, election_id):
+def vote(unique_id, candidate, election_id):
     """Prepare and send a vote message to the server."""
     message = {
         'type': 'vote',
@@ -18,7 +18,7 @@ def vote(host, port, unique_id, candidate, election_id):
         'candidate': candidate,
         'election_id': election_id,
     }
-    send_msg(host, port, message)
+    send_leader_msg(message)
 
 def main():
     """Main function to handle voting process."""
@@ -26,7 +26,7 @@ def main():
     args = parse_arguments()
 
     # Send the vote message
-    vote(LEADER_HOST, LEADER_PORT, args.id, args.candidate, args.election_id)
+    vote(args.id, args.candidate, args.election_id)
 
 if __name__ == '__main__':
     main()

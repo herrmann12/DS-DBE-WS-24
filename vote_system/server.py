@@ -95,7 +95,7 @@ class Server:
         functions = [
             self.handle_server_msgs, self.check_shutdown, self.broadcast_address,
             self.handle_broadcast_msgs, self.check_leader, self.update_ring,
-            self.send_leader, self.listen_leader
+            self.send_leader
         ]
         for func in functions:
             thread = threading.Thread(target=func)
@@ -140,31 +140,6 @@ class Server:
             self.broadcast_sock.sendto(json.dumps(msg).encode(), (BROADCAST_HOST, BROADCAST_PORT))
         except socket.error as e:
             print(f"Error broadcasting message: {e}")
-
-    def listen_leader(self):
-        """Listen for leader messages from other servers."""
-        while self.running:
-            if self.is_leader:
-                self.listen_for_leader_connections()
-
-    def listen_for_leader_connections(self):
-        """Listen and process leader connections."""
-        leader_sock = self.create_leader_socket()
-        while self.running and self.is_leader:
-            try:
-                ready_to_read, _, _ = select.select([leader_sock], [], [], 1)
-                if ready_to_read:
-                    client_sock, _ = leader_sock.accept()
-                    self.process_client_request(client_sock)
-            except socket.error as e:
-                print(f"Error handling leader connections: {e}")
-
-    def create_leader_socket(self):
-        """Create the leader socket to accept connections."""
-        leader_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        leader_sock.bind((LEADER_HOST, LEADER_PORT))
-        leader_sock.listen(5)
-        return leader_sock
 
     def process_client_request(self, client_sock):
         """Process incoming client requests."""
