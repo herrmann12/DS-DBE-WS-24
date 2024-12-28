@@ -122,6 +122,17 @@ class Server:
                 }
                 self.broadcast_message(msg)
             time.sleep(1)
+    
+    def broadcast_address(self):
+        """Check if a leader needs to be elected."""
+        while self.running:
+            msg = {
+                'type': 'ring',
+                'host': self.host,
+                'port': self.port,
+            }
+            self.broadcast_message(msg)
+            time.sleep(.5)
 
     def broadcast_message(self, msg):
         """Helper function to broadcast messages."""
