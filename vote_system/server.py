@@ -164,6 +164,8 @@ class Server:
             elif msg['type'] == 'end_election':
                 resp = self.handle_election_end(msg)
                 send_client(resp)
+            elif msg['type'] == 'lcr':
+                self.handle_lcr(msg)
         finally:
             client_sock.close()
 
@@ -197,6 +199,16 @@ class Server:
         
         election = self.elections[election_id]
         return election.register_vote(msg['id'], msg['candidate'])
+    
+    def handle_lcr(self, msg):
+        """Handle incoming vote messages."""
+        if self.is_leader:
+            return
+        other_id = msg['id']
+        if other_id == self.id:
+            self.declare_leader()
+        else:
+            self.send_neighbor(json.dumps({'id': max(self.id, other_id), 'type': 'lcr'}))
 
     def check_leader(self):
         """Check if a leader needs to be elected."""
