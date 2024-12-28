@@ -5,6 +5,8 @@ import threading
 import time
 import argparse
 import random
+import psutil
+
 from election import Election
 from constants import *
 
@@ -12,16 +14,21 @@ from constants import *
 def parse_arguments():
     """Parse and return command-line arguments."""
     parser = argparse.ArgumentParser(description="Election server setup")
-    parser.add_argument('--host', type=str, required=True, help='Host to bind to')
     parser.add_argument('--port', type=int, required=True, help='Port to bind to')
     return parser.parse_args()
 
+def get_local_ip():
+    for interface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            if addr.family == socket.AF_INET:  # IPv4 addresses
+                return addr.address
+    return None
 
 class Server:
     """Server class to handle election processes, including leader election, voting, and broadcast management."""
 
-    def __init__(self, host, port):
-        self.host = host
+    def __init__(self, port):
+        self.host = get_local_ip()
         self.port = port
         self.id = random.randint(1, int(1e9))
 
@@ -279,7 +286,7 @@ class Server:
 
 if __name__ == '__main__':
     args = parse_arguments()
-    server = Server(host=args.host, port=args.port)
+    server = Server(port=args.port)
     server.run()
 
     try:
