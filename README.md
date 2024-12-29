@@ -1,7 +1,7 @@
 # DS-DBE-WS-24
 
 ## Overview
-This is the code for the Distributed Systemes Project WS2024 from Group 08. Herby, a distributed system has been created, that allows users to vote in an election while securing that there is always a server running as the leader. The leader is responsible for handling the voting process and taking the registration for election, the vote and to close the voting.
+This is the code for the Distributed Systemes Project WS2024 from Group 08. Herby, a distributed system is created, that allows users to vote in an election while securing that there is always a server running as the leader. The leader is responsible for handling the voting process and taking the registration for election, the vote and to close the voting.
 
 ## Getting started
 Download all files from vote_system. You can run all the files in the Terminal / Command Center or conda or anything else you might prefer. Watch out, that when using Terminal / Command Center you have to install psutil manually upfront. For conda this installation is not necessary due to the environment.
