@@ -20,8 +20,9 @@ def parse_arguments():
 def get_local_ip():
     for interface, addrs in psutil.net_if_addrs().items():
         for addr in addrs:
-            if addr.family == socket.AF_INET:  # IPv4 addresses
+            if addr.family == socket.AF_INET and not addr.address.startswith('169.254'):  # IPv4 addresses # Prevent from taking APIPA adress
                 return addr.address
+            else :print("The selected address should not be used", addr.address)
     return None
 
 class Server:
