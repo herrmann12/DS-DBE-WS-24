@@ -11,13 +11,21 @@ To start the server it is neccesary to give the port number that has to be used.
 
 If your laptop is the first one to start the server in your network, you will be the leader. After this server is stopped, one of the other servers will take over. Therefore the LCR Algorithm will be used and the server with the highest id will be the new leader. Usually, this should be the newest server.
 
+`start python server.py --port 10000`
+
 ## Registering the election
 In order to vote, the election has to be registered first of all. For this, it is necessary to give an election id (id), the candidates (candidates) and autorized users (authorized_users) as arguments to the execution of the file. If the election id has already been used, an error saying that the id already exists will occur.
 
 The registration is only allowed to the admin and therefore the leader, as otherwise anyone could enter candidates to vote on or make themselves an authorized user.
 
+`python register_election.py --id 100 -- candidates dominik philip --authorized_users erman debakker`
+
 ## Voting
 For voting, you need the unique id (id), which was the value of the argument (authorized_users) in the register.py file. For canidate (candidate) provide a Name that has been provided in the registration of the election and for the election id (election_id) proivde the corresponding election id (id) from the registration. All arguments will be checked and if not valid, the vote will not be counted.
 
+`python vote.py  --id bakker --candidate philip --election_id 100`
+
 ## Closing Election
 Once everyone has voted or the time therefore passed up, the voting will come to an end. As an argument, the id of the election has to be provided. Once again, this can only be done by the admin and therefore the leader. With the end of an election, the winner will be shown to the leader.
+
+`python end_election.py --id 100`
