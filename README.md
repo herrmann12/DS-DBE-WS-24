@@ -18,7 +18,7 @@ In order to vote, the election has to be registered first of all. For this, it i
 
 The registration is only allowed to the admin and therefore the leader, as otherwise anyone could enter candidates to vote on or make themselves an authorized user.
 
-`python register_election.py --id 100 -- candidates dominik philip --authorized_users erman debakker`
+`python register_election.py --id 100 --candidates dominik philip --authorized_users erman debakker`
 
 ## Voting
 For voting, you need the unique id (id), which was the value of the argument (authorized_users) in the register.py file. For canidate (candidate) provide a Name that has been provided in the registration of the election and for the election id (election_id) proivde the corresponding election id (id) from the registration. All arguments will be checked and if not valid, the vote will not be counted.
