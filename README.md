@@ -23,7 +23,7 @@ The registration is only allowed to the admin and therefore the leader, as other
 ## Voting
 For voting, you need the unique id (id), which was the value of the argument (authorized_users) in the register.py file. For canidate (candidate) provide a Name that has been provided in the registration of the election and for the election id (election_id) proivde the corresponding election id (id) from the registration. All arguments will be checked and if not valid, the vote will not be counted.
 
-`python vote.py  --id bakker --candidate philip --election_id 100`
+`python vote.py  --id debakker --candidate philip --election_id 100`
 
 ## Closing Election
 Once everyone has voted or the time therefore passed up, the voting will come to an end. As an argument, the id of the election has to be provided. Once again, this can only be done by the admin and therefore the leader. With the end of an election, the winner will be shown to the leader.
