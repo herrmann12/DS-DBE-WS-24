@@ -126,7 +126,6 @@ class Server:
         self.running = False
         for thread in self.threads:
             thread.join()
-            logging.debug(f"Thread {thread.__name__} finished")
 
     def send_leader(self):
         """Broadcast leader information and all election details."""
@@ -227,10 +226,10 @@ class Server:
 
     def check_leader(self):
         """Check if a leader needs to be elected."""
-        logging.debug(f"New leader message received: {msg}")
         while self.running:
             if not self.is_leader and not self.lcr_ongoing and time.time() - self.last_leader_time > 5:
                 self.find_new_leader()
+                logging.info(f"Leader not available")
 
     def send_neighbor(self, msg):
         """Send a message to the next neighbor in the ring."""
@@ -294,7 +293,7 @@ class Server:
             try:
                 msg, _ = self.broadcast_sock.recvfrom(1024)
                 msg = json.loads(msg.decode())
-                logging.info(f"Broadcast message processed: {msg}")
+                logging.debug(f"Broadcast message processed: {msg}")
                 if msg['type'] == 'ring':
                     self.handle_ring_msg(msg)
                 elif msg['type'] == 'leader':
