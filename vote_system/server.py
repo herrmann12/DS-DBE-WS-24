@@ -272,7 +272,7 @@ class Server:
                 if ready_to_read:
                     client_socket, _ = self.server_socket.accept()
                     self.process_client_request(client_socket)
-                    logging.info(f"Received message: {msg}")
+                    logging.info(f"Received message from Server")
             except socket.error as e:
                 print(f"Error handling server messages: {e}")
 
