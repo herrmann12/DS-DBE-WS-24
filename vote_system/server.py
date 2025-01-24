@@ -6,9 +6,15 @@ import time
 import argparse
 import random
 import psutil
+import logging
 
 from election import Election
 from constants import *
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(funcName)s'
+)
 
 # Argument parser setup
 def parse_arguments():
@@ -22,7 +28,8 @@ def get_local_ip():
         for addr in addrs:
             if addr.family == socket.AF_INET and not addr.address.startswith('169.254') and not addr.address.startswith('127'):  # IPv4 addresses # Prevent from taking APIPA adress and localhost
                 return addr.address
-            else :print("The selected address should not be used", addr.address)
+            else :
+                logging.warning(f"This IP Adress should not be used {addr.address}")
     return None
 
 class Server:
@@ -32,6 +39,7 @@ class Server:
         self.host = get_local_ip()
         self.port = port
         self.id = random.randint(1, int(1e9))
+        logging.info(f"Server initialized on host {self.host} and port {self.port} with ID {self.id}")
 
         # Initialize sockets
         self.broadcast_sock = self.create_broadcast_socket()
@@ -109,6 +117,7 @@ class Server:
             thread = threading.Thread(target=func)
             self.threads.append(thread)
             thread.start()
+            logging.debug(f"Thread for {func.__name__} started")
         print("Server running")
 
     def stop(self):
@@ -117,6 +126,7 @@ class Server:
         self.running = False
         for thread in self.threads:
             thread.join()
+            logging.debug(f"Thread {thread.__name__} finished")
 
     def send_leader(self):
         """Broadcast leader information and all election details."""
@@ -156,6 +166,7 @@ class Server:
 
         try:
             msg = json.loads(client_sock.recv(1024).decode())
+            logging.info(f"Processing client request: {msg}")
             if msg['type'] == 'vote':
                 resp = self.handle_vote(msg)
                 send_client(resp)
@@ -173,6 +184,7 @@ class Server:
     def handle_election(self, msg):
         """Handle incoming election requests."""
         election_id = msg['id']
+        logging.info(f"Election created with ID {election_id} and candidates {msg['candidates']}")
         if election_id in self.elections:
             return f"Election id {election_id} already exists"
         
@@ -182,6 +194,7 @@ class Server:
     def handle_election_end(self, msg):
         """Handle election end and calculate results."""
         election_id = msg['id']
+        logging.info(f"Election {election_id} ended. Winner: {winner}")
         if election_id not in self.elections:
             return f"Election id {election_id} not found"
         
@@ -195,6 +208,7 @@ class Server:
     def handle_vote(self, msg):
         """Handle incoming vote messages."""
         election_id = msg['election_id']
+        logging.info(f"Vote received for election {election_id}: {msg}")
         if election_id not in self.elections:
             return f"Error: Election id {election_id} unknown"
         
@@ -213,6 +227,7 @@ class Server:
 
     def check_leader(self):
         """Check if a leader needs to be elected."""
+        logging.debug(f"New leader message received: {msg}")
         while self.running:
             if not self.is_leader and not self.lcr_ongoing and time.time() - self.last_leader_time > 5:
                 self.find_new_leader()
@@ -229,6 +244,7 @@ class Server:
     def find_new_leader(self):
         """Find and declare a new leader."""
         self.lcr_ongoing = True
+        logging.info(f"Leader election initiated by server {self.id}")
         if self.neighbor == (self.host, self.port):
             self.declare_leader()
         else:
@@ -239,6 +255,7 @@ class Server:
         print("I am the new leader")
         self.is_leader = True
         self.lcr_ongoing = False
+        logging.info(f"Server {self.id} declared itself as leader")
 
     def check_shutdown(self):
         """Check for server shutdown signal."""
@@ -256,6 +273,7 @@ class Server:
                 if ready_to_read:
                     client_socket, _ = self.server_socket.accept()
                     self.process_client_request(client_socket)
+                    logging.info(f"Received message: {msg}")
             except socket.error as e:
                 print(f"Error handling server messages: {e}")
 
@@ -276,6 +294,7 @@ class Server:
             try:
                 msg, _ = self.broadcast_sock.recvfrom(1024)
                 msg = json.loads(msg.decode())
+                logging.info(f"Broadcast message processed: {msg}")
                 if msg['type'] == 'ring':
                     self.handle_ring_msg(msg)
                 elif msg['type'] == 'leader':
@@ -292,9 +311,12 @@ class Server:
             for (h, p), t in self.ring_last_seen.copy().items():
                 if time.time() - t > 2:
                     del self.ring_last_seen[(h, p)]
+                    logging.warning(f"Server {(h, p)} removed from ring due to timeout")
             ring_members = list(self.ring_last_seen.keys())
+            logging.info(f"These are the servers: {ring_members}")
             i = ring_members.index((self.host, self.port))
             self.neighbor = ring_members[(i + 1) % len(ring_members)]
+            logging.info(f"Updated neighbor: {self.neighbor}")
 
 
 if __name__ == '__main__':
