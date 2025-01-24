@@ -313,10 +313,10 @@ class Server:
                     del self.ring_last_seen[(h, p)]
                     logging.warning(f"Server {(h, p)} removed from ring due to timeout")
             ring_members = list(self.ring_last_seen.keys())
-            logging.info(f"These are the servers: {ring_members}")
+            logging.debug(f"These are the servers: {ring_members}")
             i = ring_members.index((self.host, self.port))
             self.neighbor = ring_members[(i + 1) % len(ring_members)]
-            logging.info(f"Updated neighbor: {self.neighbor}")
+            logging.debug(f"Updated neighbor: {self.neighbor}")
 
 
 if __name__ == '__main__':
