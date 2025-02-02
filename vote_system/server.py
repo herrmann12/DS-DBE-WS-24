@@ -193,12 +193,13 @@ class Server:
     def handle_election_end(self, msg):
         """Handle election end and calculate results."""
         election_id = msg['id']
-        logging.info(f"Election {election_id} ended. Winner: {winner}")
+        logging.info(f"Election {election_id} ended.")
         if election_id not in self.elections:
             return f"Election id {election_id} not found"
         
         election = self.elections[election_id]
         winner = max(election.get_votes(), key=election.get_votes().get)
+        logging.info(f"Winner: {winner}")
 
         result_msg = f"Election {election_id} ended. The winner is {winner}."
         self.remove_election(election_id)
